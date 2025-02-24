@@ -1,0 +1,533 @@
+{
+	"info": {
+		"_postman_id": "98796eee-02ba-47d8-8531-868ce498904e",
+		"name": "itHillelAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "16899744"
+	},
+	"item": [
+		{
+			"name": "Register the User",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"firstName\", pm.variables.replaceIn(\"{{$randomFirstName}}\"));\r",
+							"pm.collectionVariables.set(\"lastName\", pm.variables.replaceIn(\"{{$randomLastName}}\"));\r",
+							"pm.collectionVariables.set(\"email\", pm.variables.replaceIn(\"{{$randomEmail}}\"));\r",
+							"pm.collectionVariables.set(\"password\", pm.variables.replaceIn(\"passwordNew123!\"));"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let response = pm.response.json();\r",
+							"\r",
+							"pm.environment.set(\"userId\", response.data.userId);\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Email is valid\", function () {\r",
+							"    let requestBody = pm.request.body.raw; \r",
+							"    let requestData = JSON.parse(requestBody); \r",
+							"    let email = requestData.email; \r",
+							"\r",
+							"    let emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/; \r",
+							"\r",
+							"    pm.expect(email).to.match(emailRegex, \"Email is invalid\");\r",
+							"});\r",
+							"\r",
+							"const schema = {\r",
+							"    \"type\": \"object\",\r",
+							"    \"properties\": {\r",
+							"        \"status\": { \"type\": \"string\" },\r",
+							"        \"data\": {\r",
+							"            \"type\": \"object\",\r",
+							"            \"properties\": {\r",
+							"                \"userId\": { \"type\": \"integer\" },\r",
+							"                \"photoFilename\": { \"type\": \"string\" },\r",
+							"                \"distanceUnits\": { \"type\": \"string\", \"enum\": [\"km\", \"miles\"] },\r",
+							"                \"currency\": { \"type\": \"string\", \"enum\": [\"usd\", \"eur\", \"gbp\"] }\r",
+							"            },\r",
+							"            \"required\": [\"userId\", \"photoFilename\", \"distanceUnits\", \"currency\"]\r",
+							"        }\r",
+							"    },\r",
+							"    \"required\": [\"status\", \"data\"]\r",
+							"};\r",
+							"\r",
+							"pm.test(\"Response matches JSON schema\", function() {\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"{{firstName}}\",\r\n  \"lastName\": \"{{lastName}}\",\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"{{password}}\",\r\n  \"repeatPassword\": \"{{password}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{domain}}/api/auth/signup",
+					"host": [
+						"{{domain}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Change user profile",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let requestBody = JSON.parse(pm.request.body.raw); \r",
+							"let responseData = pm.response.json().data; \r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Name is matched\", function () {\r",
+							"    pm.expect(responseData.name).to.eql(requestBody.name, \"Name isn't matched\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"LastName is matched\", function () {\r",
+							"    pm.expect(responseData.lastName).to.eql(requestBody.lastName, \"LastName isn't matched\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Country is matched\", function () {\r",
+							"    pm.expect(responseData.country).to.eql(requestBody.country, \"Country isn't matched\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"DateBirth is matched\", function () {\r",
+							"    let requestDate = new Date(requestBody.dateBirth).toISOString();\r",
+							"    let responseDate = new Date(responseData.dateBirth).toISOString();\r",
+							"    pm.expect(responseDate).to.eql(requestDate, \"DateBirth isn't matched\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Photo file exist\", function () {\r",
+							"    pm.expect(responseData.photoFilename).to.exist;\r",
+							"});\r",
+							"    \r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"photo\": \"user-1621352948859.jpg\",\r\n  \"name\": \"John\",\r\n  \"lastName\": \"Dou\",\r\n  \"dateBirth\": \"2021-03-17T15:21:05.000Z\",\r\n  \"country\": \"Ukraine\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{domain}}/api/users/profile",
+					"host": [
+						"{{domain}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Change user password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"new_password\", pm.variables.replaceIn(\"Qwerty12345!\"));\r",
+							"\r",
+							"let response = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"UserId is matched to the created user\", function () {\r",
+							"    let storedUserId = pm.environment.get(\"userId\");\r",
+							"    pm.expect(response.data.userId).to.eql(parseInt(storedUserId), \"userId isn't matched\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"oldPassword\": \"{{password}}\",\r\n  \"password\": \"{{new_password}}\",\r\n  \"repeatPassword\": \"{{new_password}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{domain}}/api/users/password",
+					"host": [
+						"{{domain}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let response = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status ok\", function () { \r",
+							"    pm.expect(response.status).to.eql('ok');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{domain}}/api/auth/logout",
+					"host": [
+						"{{domain}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let response = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"UserId is matched to the created user\", function () {\r",
+							"    let storedUserId = pm.environment.get(\"userId\");\r",
+							"    pm.expect(response.data.userId).to.eql(parseInt(storedUserId), \"userId isn't matched\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status ok\", function () {\r",
+							"    pm.expect(response.status).to.eql('ok');\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"{{new_password}}\",\r\n  \"remember\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{domain}}/api/auth/signin",
+					"host": [
+						"{{domain}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"signin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create cars",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let requestBody = JSON.parse(pm.request.body.raw); \r",
+							"let response = pm.response.json(); \r",
+							"let responseData = response.data;\r",
+							"\r",
+							"pm.environment.set(\"carID\", responseData.id);\r",
+							"pm.environment.set(\"mileage\", rresponseData.mileage + 1);\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"CarBrandId is matched\", function () {\r",
+							"    pm.expect(responseData.carBrandId).to.eql(requestBody.carBrandId, \"CarBrandId isn't matched\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"CarModelId is matched\", function () {\r",
+							"    pm.expect(responseData.carModelId).to.eql(requestBody.carModelId, \"CarModelId isn't matched\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Mileage is matched\", function () {\r",
+							"    pm.expect(responseData.mileage).to.eql(requestBody.mileage, \"Mileage isn't matched\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"carBrandId\": 1,\r\n  \"carModelId\": 2,\r\n  \"mileage\": 122\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{domain}}/api/cars",
+					"host": [
+						"{{domain}}"
+					],
+					"path": [
+						"api",
+						"cars"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add expenses to the car",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let today = new Date().toISOString();\r",
+							"pm.environment.set(\"currentDate\", today);\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let requestBody = JSON.parse(pm.request.body.raw); \r",
+							"let responseData = pm.response.json().data; \r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"CarId is matched\", function () {\r",
+							"    pm.expect(responseData.carId).to.eql(requestBody.carId, \"CarId isn't matched\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Liters is matched\", function () {\r",
+							"    pm.expect(responseData.liters).to.eql(requestBody.liters, \"Liters isn't matched\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Mileage is matched\", function () {\r",
+							"    pm.expect(responseData.mileage).to.eql(requestBody.mileage, \"Mileage isn't matched\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"TotalCost is matched\", function () {\r",
+							"    pm.expect(responseData.totalCost).to.eql(requestBody.totalCost, \"TotalCost isn't matched\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"carId\": {{carID}},\r\n  \"reportedAt\": \"{{currentDate}}\",\r\n  \"mileage\": {{mileage}},\r\n  \"liters\": 12,\r\n  \"totalCost\": 50,\r\n  \"forceMileage\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{domain}}/api/expenses",
+					"host": [
+						"{{domain}}"
+					],
+					"path": [
+						"api",
+						"expenses"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let response = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status is ok\", function () {\r",
+							"    pm.expect(response.status).to.eql('ok');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{domain}}/api/users",
+					"host": [
+						"{{domain}}"
+					],
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "email",
+			"value": ""
+		},
+		{
+			"key": "password",
+			"value": ""
+		},
+		{
+			"key": "firstName",
+			"value": ""
+		},
+		{
+			"key": "lastName",
+			"value": ""
+		},
+		{
+			"key": "new_password",
+			"value": ""
+		}
+	]
+}
