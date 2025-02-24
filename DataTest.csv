@@ -1,0 +1,11 @@
+﻿domain,user_invalid,user,email,password,new_password,,expectedMessage
+https://qauto.forstudy.space,,Marina,Sam_BeierM@yahoo.com,passwordNew123!,Qwerty12345!,,"""name"" is not allowed to be empty"
+https://qauto.forstudy.space,      ,Marina,Sam_BeierM@yahoo.com,passwordNew123!,Qwerty12345!,,"""name"" is not allowed to be empty"
+https://qauto.forstudy.space,12Ana,Marina,Sam_BeierM@yahoo.com,passwordNew123!,Qwerty12345!,,Name is invalid
+https://qauto.forstudy.space,Ana!#,Marina,Sam_BeierM@yahoo.com,passwordNew123!,Qwerty12345!,,Name is invalid
+https://qauto.forstudy.space,A,Marina,Sam_BeierM@yahoo.com,passwordNew123!,Qwerty12345!,,Name has to be from 2 to 20 characters long
+https://qauto2.forstudy.space,,Marina,Sam_BeierM@yahoo.com,passwordNew123!,Qwerty12345!,,"""name"" is not allowed to be empty"
+https://qauto2.forstudy.space,       ,Marina,Sam_BeierM@yahoo.com,passwordNew123!,Qwerty12345!,,"""name"" is not allowed to be empty"
+https://qauto2.forstudy.space,12Ana,Marina,Sam_BeierM@yahoo.com,passwordNew123!,Qwerty12345!,,Name is invalid
+https://qauto2.forstudy.space,Ana!#,Marina,Sam_BeierM@yahoo.com,passwordNew123!,Qwerty12345!,,Name is invalid
+https://qauto2.forstudy.space,A,Marina,Sam_BeierM@yahoo.com,passwordNew123!,Qwerty12345!,,Name has to be from 2 to 20 characters long
